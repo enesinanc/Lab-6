@@ -91,6 +91,8 @@ R3: reg
 end Behavioral;
 
 
+
+
 control unit: 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -110,8 +112,8 @@ entity control is
            go : in STD_LOGIC;
            equal : in STD_LOGIC;
            lta : in STD_LOGIC;
-           selectx : out STD_LOGIC;
-           selecty : out STD_LOGIC;
+           xselect : out STD_LOGIC;
+           yselect : out STD_LOGIC;
            xld : out STD_LOGIC;
            yld : out STD_LOGIC;
            gld : out STD_LOGIC);
@@ -168,11 +170,11 @@ end process;
 C2: process (present_state)
 begin
     xld <= '0'; yld <= '0'; gld <= '0';
-    selectx <= '0'; selecty <= '0';
+    xselect <= '0'; yselect <= '0';
     case present_state is
         when input =>
             xld <= '1'; yld <= '1';
-            selectx <= '1'; selecty <='1';
+            xselect <= '1'; yselect <='1';
         when update => 
             yld <= '1';
         when update2 =>
@@ -183,6 +185,67 @@ begin
             null;
     end case;            
 end process;
+end Behavioral;
+
+gcd:
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity gcd is
+    Port ( clk : in STD_LOGIC;
+           clr : in STD_LOGIC;
+           go : in STD_LOGIC;
+           xin : in STD_LOGIC_VECTOR (7 downto 0);
+           yin : in STD_LOGIC_VECTOR (7 downto 0);
+           gcd_out : out STD_LOGIC_VECTOR (7 downto 0));
+end gcd;
+
+architecture Behavioral of gcd is
+    component main
+    Port ( clk : in STD_LOGIC;
+       clr : in STD_LOGIC;
+       xselect : in STD_LOGIC;
+       yselect : in STD_LOGIC;
+       xld : in STD_LOGIC;
+       yld : in STD_LOGIC;
+       gld : in STD_LOGIC;
+       xin : in STD_LOGIC_VECTOR (7 downto 0);
+       yin : in STD_LOGIC_VECTOR (7 downto 0);
+       gcd : out STD_LOGIC_VECTOR (7 downto 0);
+       equal : out STD_LOGIC;
+       lta : out STD_LOGIC);
+    end component;
+    
+    component control
+    Port ( clk : in STD_LOGIC;
+           clr : in STD_LOGIC;
+           go : in STD_LOGIC;
+           equal : in STD_LOGIC;
+           lta : in STD_LOGIC;
+           xselect : out STD_LOGIC;
+           yselect : out STD_LOGIC;
+           xld : out STD_LOGIC;
+           yld : out STD_LOGIC;
+           gld : out STD_LOGIC);
+    end component;
+signal equal,lta,xselect,yselect: std_logic;
+signal xld,yld,gld: std_logic; 
+
+begin
+U1: main
+    port map ( clk => clk, clr => clr, xselect => xselect, yselect => yselect, xld =>xld,yld=>yld, gld => gld, xin => xin, yin=>yin, gcd => gcd_out , equal => equal,lta=>lta);
+U2: control
+    port map ( clk => clk, clr => clr, go => go, equal => equal, lta => lta, xselect => xselect, yselect => yselect, xld=> xld, yld => yld, gld=>gld);
+     
 end Behavioral;
 
 
